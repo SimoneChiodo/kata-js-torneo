@@ -1,5 +1,5 @@
 // Dichiaro le liste "fighters" (combattenti) e "weapons" (armi)
-const fighters = [
+let fighters = [
   {
       name: 'Freezer',
       power: 8000
@@ -102,14 +102,15 @@ const weapons = [
 
 // FASE 1: SCELTA DELL'ARMA ---------------
 // Mostro i combattanti disarmati
+console.log("SCELTA DELL'ARMA ---------------");
 console.log("COMBATTENTI DISARMATI: ");
 console.log(convertJSON(fighters));
 
 // Ogni combattente prende un'arma random (questa non sarà più disponibile per gli altri)
-for(fighter of fighters) {
+fighters.map(fighter => {
   let randomIndex = Math.floor(Math.random() * weapons.length); // Prendo l'indice di un'arma casuale
   fighter.weapon = weapons.splice(randomIndex, 1); // Il combattente prende l'arma dall'elenco
-}
+});
 // Mostro i combattanti armati
 console.log("COMBATTENTI ARMATI: ");
 console.log(convertJSON(fighters));
@@ -118,15 +119,22 @@ console.log(weapons);
 
 // FASE 2: ALLENAMENTO ---------------
 // Ogni combattente può moltiplicare la sua potenza per un numero tra 1 e 100
-for(fighter of fighters) {
+console.log("ALLENAMENTO ---------------");
+fighters.map(fighter => {
   if(Math.floor(Math.random() * 2 + 1) == 1) { // 1/2 possibilità di potenziarsi
     fighter.power *= Math.floor(Math.random() * 100 + 1); // la potenza si moltiplica per un valore tra 1 e 100
     console.log("POTENTE: " + convertJSON(fighter));
   } else {
     console.log("NORMALE: " + convertJSON(fighter));
   }
-}
+});
 
+// FASE 3: QUALIFICAZIONE ---------------
+// Mantengo solo i combattenti che hanno una potenza sopra i 2000
+console.log("QUALIFICAZIONE ---------------");
+console.log("ECCO TUTTI I COMBATTENTI: " + convertJSON(fighters));
+fighters = fighters.filter(fighter => fighter.power >= 2000);
+console.log("ECCO I COMBATTENTI CHE HANNO PASSATO LE QUALIFICAZIONI: " + convertJSON(fighters));
 
 // Metodi HELPER
 /**
