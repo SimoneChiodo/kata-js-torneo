@@ -162,6 +162,12 @@ for(let i = 0; i < fighters.length; i++) {
 fighters = fighters.filter(fighter => fighter.looser != true); // Rimuovo i perdenti
 console.log("VINCITORI (" + fighters.length + "): " + convertJSON(fighters));
 
+// FASE 4: PREMIAZIONE ---------------
+// Mostro il podio composto da i primi 3 combattenti con la potenza maggiore, in ordine decrescente
+let winners = fighters.slice(0, 3); // Creo una nuova variabile per il podio
+winners.sort((a, b) => b.power - a.power); // ASC: a.power - b.power
+console.log(winners);
+
 
 // Metodi HELPER
 /**
