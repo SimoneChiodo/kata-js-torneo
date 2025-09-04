@@ -109,7 +109,7 @@ console.log(convertJSON(fighters));
 // Ogni combattente prende un'arma random (questa non sarà più disponibile per gli altri)
 fighters.map(fighter => {
   let randomIndex = Math.floor(Math.random() * weapons.length); // Prendo l'indice di un'arma casuale
-  fighter.weapon = weapons.splice(randomIndex, 1); // Il combattente prende l'arma dall'elenco
+  fighter.weapon = weapons.splice(randomIndex, 1)[0]; // Il combattente prende l'arma dall'elenco (NOTA: [0] rimuove l'oggetto dall'array)
 });
 // Mostro i combattanti armati
 console.log("COMBATTENTI ARMATI: ");
@@ -135,6 +135,33 @@ console.log("QUALIFICAZIONE ---------------");
 console.log("ECCO TUTTI I COMBATTENTI: " + convertJSON(fighters));
 fighters = fighters.filter(fighter => fighter.power >= 2000);
 console.log("ECCO I COMBATTENTI CHE HANNO PASSATO LE QUALIFICAZIONI: " + convertJSON(fighters));
+
+// FASE 4: COMBATTIMENTO ---------------
+// Ogni combattente combatte con il successivo in lista 
+// Ogni combattente deve combattere solo una volta, nel caso siano dispari si aggiunge un robot combattente
+// In caso di parita vince chi viene prima nella lista
+console.log("COMBATTIMENTO ---------------");
+if(fighters.length % 2 !== 0) // Se i combattenti sono dispari
+  fighters.push({ name: 'Robot', power: 4000, weapon: { name: "Mani nude", power: 0 }}); // Aggiungo un combattente robot
+
+console.log("COMBATTENTI PRONTI (" + fighters.length + "): " + convertJSON(fighters));
+for(let i = 0; i < fighters.length; i++) {
+  console.log("NUOV ROUND");
+  
+  const power1 = fighters[i].power + fighters[i].weapon.power;
+  console.log("COMBATTENTE 1: " + convertJSON(fighters[i].name) + " + " + power1);
+  i++;
+  const power2 = fighters[i].power + fighters[i].weapon.power;
+  console.log("COMBATTENTE 2: " + convertJSON(fighters[i].name) + " + " + power2);
+
+  if(power1 < power2) // Vince il secondo combattente
+    fighters[i-1].looser = true; // Segnalo i perdenti, per poi rimuoverli dopo
+  else if(power1 >= power2) // Vince il primo combattente o pareggiano
+    fighters[i].looser = true; // Segnalo i perdenti, per poi rimuoverli dopo
+}
+fighters = fighters.filter(fighter => fighter.looser != true); // Rimuovo i perdenti
+console.log("VINCITORI (" + fighters.length + "): " + convertJSON(fighters));
+
 
 // Metodi HELPER
 /**
