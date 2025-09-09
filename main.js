@@ -102,11 +102,26 @@ const weapons = [
 
 let tournamentStarted = false;
 
+// Mostro i combattenti a schermo
+const fightersRow = document.getElementById("fightersRow");
+fighters.map(fighter => {
+  fightersRow.innerHTML += `<div class="col"> 
+    <div id="card${fighter.name}" class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">${fighter.name}</h5>
+        <p id="cardPower${fighter.name}" class="card-text"><b>power:</b> ${fighter.power}</p>
+        <p id="cardWeapon${fighter.name}" class="card-text"><b>weapon:</b>  ${fighter.weapon ? fighter.weapon.name : "<i>empty</i>"}</p>
+        <p id="cardWeaponPower${fighter.name}" class="card-text"><b>weapon power:</b>  ${fighter.weapon ? fighter.weapon.power : "<i>empty</i>"}</p>
+      </div>
+    </div>
+  </div>`;
+});
+
 // Funzione per far partire il torneo
 function startTournament(){
   if(tournamentStarted)
     return;
-  let buttonStart = document.getElementById("buttonStartTorunament");
+  const buttonStart = document.getElementById("buttonStartTorunament");
   buttonStart.classList.add("disabled");
   tournamentStarted = true;
 
@@ -120,6 +135,8 @@ function startTournament(){
   fighters.map(fighter => {
     let randomIndex = randomNumber(0, weapons.length-1); // Prendo l'indice di un'arma casuale (il massimo non è incluso)
     fighter.weapon = weapons.splice(randomIndex, 1)[0]; // Il combattente prende l'arma dall'elenco (NOTA: [0] rimuove l'oggetto dall'array)
+    document.getElementById(`cardWeapon${fighter.name}`).innerHTML = `<b>weapon:</b>  ${fighter.weapon.name}`;
+    document.getElementById(`cardWeaponPower${fighter.name}`).innerHTML = `<b>weapon power:</b>  ${fighter.weapon.power}`;
   });
   // Mostro i combattanti armati
   console.log("COMBATTENTI ARMATI: ");

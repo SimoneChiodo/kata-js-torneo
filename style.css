@@ -1,0 +1,11 @@
+.move{
+  position: absolute;
+  left: 0%;
+  transition: all 1s;
+}
+
+.moved {
+  left: 100%;
+}
+
+/* USARE MOVE E POI AGGIUNGERE MOVED */
