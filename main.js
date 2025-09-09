@@ -164,8 +164,7 @@ console.log("VINCITORI (" + fighters.length + "): " + convertJSON(fighters));
 
 // FASE 4: PREMIAZIONE ---------------
 // Mostro il podio composto da i primi 3 combattenti con la potenza maggiore, in ordine decrescente
-let winners = fighters.slice(0, 3); // Creo una nuova variabile per il podio
-winners.sort((a, b) => b.power - a.power); // ASC: a.power - b.power
+let winners = fighters.sort((a, b) => b.power - a.power).slice(0, 3); // Creo una nuova variabile per il podio (NOTA: ASC -> "a.power - b.power")
 console.log("SUL PODIO CI SONO:");
 winners.map((winner, index) => console.log(index+1 + ", " + convertJSON(winner)));
 
