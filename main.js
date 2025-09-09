@@ -108,7 +108,7 @@ console.log(convertJSON(fighters));
 
 // Ogni combattente prende un'arma random (questa non sarà più disponibile per gli altri)
 fighters.map(fighter => {
-  let randomIndex = Math.floor(Math.random() * weapons.length); // Prendo l'indice di un'arma casuale
+  let randomIndex = randomNumber(0, weapons.length-1); // Prendo l'indice di un'arma casuale (il massimo non è incluso)
   fighter.weapon = weapons.splice(randomIndex, 1)[0]; // Il combattente prende l'arma dall'elenco (NOTA: [0] rimuove l'oggetto dall'array)
 });
 // Mostro i combattanti armati
@@ -121,8 +121,8 @@ console.log(weapons);
 // Ogni combattente può moltiplicare la sua potenza per un numero tra 1 e 100
 console.log("ALLENAMENTO ---------------");
 fighters.map(fighter => {
-  if(Math.floor(Math.random() * 2 + 1) == 1) { // 1/2 possibilità di potenziarsi
-    fighter.power *= Math.floor(Math.random() * 100 + 1); // la potenza si moltiplica per un valore tra 1 e 100
+  if(randomNumber(1, 2) == 1) { // 1/2 possibilità di potenziarsi
+    fighter.power *= randomNumber(1, 100); // la potenza si moltiplica per un valore tra 1 e 100
     console.log("POTENTE: " + convertJSON(fighter));
   } else {
     console.log("NORMALE: " + convertJSON(fighter));
@@ -171,7 +171,7 @@ winners.map((winner, index) => console.log(index+1 + ", " + convertJSON(winner))
 
 // Metodi HELPER
 /**
- * Function to generare a random number between a min and a max.
+ * Function to generare a random number between a min and a max (included).
  * @param {number} min - Min number to generate
  * @param {number} max - Max number to generate
  * @returns {number} - Random number
