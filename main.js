@@ -102,21 +102,11 @@ const weapons = [
 
 const buttonStart = document.getElementById("buttonStartTorunament");
 let step = 0;
+let fightersFiltered = [];
 
 // Mostro i combattenti a schermo
 const fightersRow = document.getElementById("fightersRow");
-fighters.map(fighter => {
-  fightersRow.innerHTML += `<div class="col"> 
-    <div id="card${fighter.name}" class="card h-100">
-      <div class="card-body">
-        <h5 class="card-title">${fighter.name}</h5>
-        <p id="cardPower${fighter.name}" class="card-text"><b>power:</b> ${fighter.power}</p>
-        <p id="cardWeapon${fighter.name}" class="card-text"><b>weapon:</b>  ${fighter.weapon ? fighter.weapon.name : "<i>empty</i>"}</p>
-        <p id="cardWeaponPower${fighter.name}" class="card-text"><b>weapon power:</b>  ${fighter.weapon ? fighter.weapon.power : "<i>empty</i>"}</p>
-      </div>
-    </div>
-  </div>`;
-});
+printFighters(fighters);
 
 // Funzione per far partire il torneo
 function startTournament(){
@@ -165,13 +155,14 @@ function startTournament(){
   if(step == 3) {
     console.log("QUALIFICAZIONE ---------------");
     console.log("ECCO TUTTI I COMBATTENTI: " + convertJSON(fighters));
-    fighters = fighters.filter(fighter => {
+    fighters.map(fighter => {
       const keep = fighter.power >= 2000;
-      // AGGIORNO LA GRAFICA
-      if(!keep)
-        document.getElementById(`card${fighter.name}`).classList.add("disabled");
-
-      return keep;
+      if(!keep) { 
+        fighter.looser = true; // Informo chi ha perso
+        document.getElementById(`card${fighter.name}`).classList.add("disabled"); // AGGIORNO LA GRAFICA
+      }
+      else // Salvo i combattenti rimasti
+        fightersFiltered.push(fighter);
     });
     console.log("ECCO I COMBATTENTI CHE HANNO PASSATO LE QUALIFICAZIONI: " + convertJSON(fighters));
   }
@@ -182,52 +173,70 @@ function startTournament(){
   // In caso di parita vince chi viene prima nella lista
   if(step == 4) {
     console.log("COMBATTIMENTO ---------------");
-    if(fighters.length % 2 !== 0) { // Se i combattenti sono dispari
-      fighters.push({ name: 'Robot', power: 4000, weapon: { name: "Mani nude", power: 0 }}); // Aggiungo un combattente robot
-      const [ botFighter ] = fighters.slice(-1);
+    if(fightersFiltered.length % 2 !== 0) { // Se i combattenti sono dispari
+      const robot = { name: 'Robot', power: 4000, weapon: { name: "Mani nude", power: 0 }};
+      fighters.push(robot); // Aggiungo un combattente robot
+      fightersFiltered.push(robot); // Aggiungo un combattente robot
       // AGGIORNO LA GRAFICA
-      fightersRow.innerHTML += `<div class="col"> 
-        <div id="card${botFighter.name}" class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">${botFighter.name}</h5>
-            <p id="cardPower${botFighter.name}" class="card-text"><b>power:</b> ${botFighter.power}</p>
-            <p id="cardWeapon${botFighter.name}" class="card-text"><b>weapon:</b>  ${botFighter.weapon ? botFighter.weapon.name : "<i>empty</i>"}</p>
-            <p id="cardWeaponPower${botFighter.name}" class="card-text"><b>weapon power:</b>  ${botFighter.weapon ? botFighter.weapon.power : "<i>empty</i>"}</p>
-          </div>
-        </div>
-      </div>`;
+      printFighters(fighters);
     }
 
-    console.log("COMBATTENTI PRONTI (" + fighters.length + "): " + convertJSON(fighters));
-    for(let i = 0; i < fighters.length; i++) {
+    console.log("COMBATTENTI PRONTI (" + fightersFiltered.length + "): " + convertJSON(fightersFiltered));
+    for(let i = 0; i < fightersFiltered.length; i++) {
       console.log("NUOVO ROUND");
       
-      const power1 = fighters[i].power + fighters[i].weapon.power;
-      console.log("COMBATTENTE 1: " + convertJSON(fighters[i].name) + " + " + power1);
+      const power1 = fightersFiltered[i].power + fightersFiltered[i].weapon.power;
+      console.log("COMBATTENTE 1: " + convertJSON(fightersFiltered[i].name) + " + " + power1);
       i++;
-      const power2 = fighters[i].power + fighters[i].weapon.power;
-      console.log("COMBATTENTE 2: " + convertJSON(fighters[i].name) + " + " + power2);
+      const power2 = fightersFiltered[i].power + fightersFiltered[i].weapon.power;
+      console.log("COMBATTENTE 2: " + convertJSON(fightersFiltered[i].name) + " + " + power2);
 
       if(power1 < power2) {// Vince il secondo combattente
-        fighters[i-1].looser = true; // Segnalo i perdenti, per poi rimuoverli dopo
-        // AGGIORNO LA GRAFICA
-        document.getElementById(`card${fighters[i-1].name}`).classList.add("disabled");
+        fightersFiltered[i-1].looser = true; // Segnalo i perdenti, per poi rimuoverli dopo
       } else { // Vince il primo combattente o pareggiano
-        fighters[i].looser = true; // Segnalo i perdenti, per poi rimuoverli dopo
-        // AGGIORNO LA GRAFICA
-        document.getElementById(`card${fighters[i].name}`).classList.add("disabled");
+        fightersFiltered[i].looser = true; // Segnalo i perdenti, per poi rimuoverli dopo
       } 
     }
-    fighters = fighters.filter(fighter => fighter.looser != true); // Rimuovo i perdenti
-    console.log("VINCITORI (" + fighters.length + "): " + convertJSON(fighters));
+    fightersFiltered = fightersFiltered.filter(fighter => fighter.looser != true); // Rimuovo i perdenti
+    console.log("VINCITORI (" + fightersFiltered.length + "): " + convertJSON(fightersFiltered));
+    // AGGIORNO LA GRAFICA
+    fighters = fighters.map(fighter => {
+      let newFighter = fightersFiltered.find(fighterFiltered => fighterFiltered.name === fighter.name); // Cerco una versione aggiornata nell'altro array
+      return newFighter ?? fighter; // Se non trova una versione aggiornata, restituisce l'originale
+    });
+    printFighters(fighters);
   }
 
   // FASE 4: PREMIAZIONE ---------------
   // Mostro il podio composto da i primi 3 combattenti con la potenza maggiore, in ordine decrescente
   if(step == 5) {
-    let winners = fighters.sort((a, b) => b.power - a.power).slice(0, 3); // Creo una nuova variabile per il podio (NOTA: ASC -> "a.power - b.power")
+    console.log("PREMIAZIONE ---------------");
+    let winners = fightersFiltered.sort((a, b) => b.power - a.power).slice(0, 3); // Creo una nuova variabile per il podio (NOTA: ASC -> "a.power - b.power")
     console.log("SUL PODIO CI SONO:");
-    winners.map((winner, index) => console.log(index+1 + ", " + convertJSON(winner)));
+    winners.map((winner, index) => {
+      console.log(index+1 + ", " + convertJSON(winner))
+      // AGGIORNO LA GRAFICA
+      const podiumRow = document.getElementById("podium");
+      podiumRow.innerHTML += `<div class="col"> 
+        <div id="card${winner.name}" class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">${index+1}° ${winner.name}</h5>
+            <p id="cardPower${winner.name}" class="card-text"><b>power:</b> ${winner.power}</p>
+            <p id="cardWeapon${winner.name}" class="card-text"><b>weapon:</b>  ${winner.weapon ? winner.weapon.name : "<i>empty</i>"}</p>
+            <p id="cardWeaponPower${winner.name}" class="card-text"><b>weapon power:</b>  ${winner.weapon ? winner.weapon.power : "<i>empty</i>"}</p>
+          </div>
+        </div>
+      </div>`;
+    });
+
+    fightersFiltered = fightersFiltered.sort((a, b) => b.power - a.power);
+    fightersFiltered.slice(3).map(fighter => {
+      fighter.notPodium = true;
+      return fighter;
+    });
+    // AGGIORNO LA GRAFICA
+    printFighters(fighters);
+    console.log("FINALE: " + convertJSON(fightersFiltered));
   }
 }
 
@@ -249,6 +258,22 @@ function updateStep(step){
     default:
       buttonStart.classList.add("disabled");
   }
+}
+
+function printFighters(fighters) {
+  fightersRow.innerHTML = ""; // Reset at start
+  fighters.map(fighter => {
+    fightersRow.innerHTML += `<div class="col"> 
+      <div id="card${fighter.name}" class="card h-100 ${fighter.looser ? "disabled" : ""} ${fighter.notPodium ? "fst-italic" : ""}">
+        <div class="card-body">
+          <h5 class="card-title">${fighter.name}</h5>
+          <p id="cardPower${fighter.name}" class="card-text"><b>power:</b> ${fighter.power}</p>
+          <p id="cardWeapon${fighter.name}" class="card-text"><b>weapon:</b>  ${fighter.weapon ? fighter.weapon.name : "<i>empty</i>"}</p>
+          <p id="cardWeaponPower${fighter.name}" class="card-text"><b>weapon power:</b>  ${fighter.weapon ? fighter.weapon.power : "<i>empty</i>"}</p>
+        </div>
+      </div>
+    </div>`;
+  });
 }
 
 
