@@ -167,13 +167,13 @@ function startTournament(){
     console.log("ECCO TUTTI I COMBATTENTI: " + convertJSON(fighters));
     fighters = fighters.filter(fighter => {
       const keep = fighter.power >= 2000;
+      // AGGIORNO LA GRAFICA
       if(!keep)
         document.getElementById(`card${fighter.name}`).classList.add("disabled");
 
       return keep;
     });
     console.log("ECCO I COMBATTENTI CHE HANNO PASSATO LE QUALIFICAZIONI: " + convertJSON(fighters));
-    // AGGIORNO LA GRAFICA
   }
 
   // FASE 4: COMBATTIMENTO ---------------
@@ -182,12 +182,25 @@ function startTournament(){
   // In caso di parita vince chi viene prima nella lista
   if(step == 4) {
     console.log("COMBATTIMENTO ---------------");
-    if(fighters.length % 2 !== 0) // Se i combattenti sono dispari
+    if(fighters.length % 2 !== 0) { // Se i combattenti sono dispari
       fighters.push({ name: 'Robot', power: 4000, weapon: { name: "Mani nude", power: 0 }}); // Aggiungo un combattente robot
+      const [ botFighter ] = fighters.slice(-1);
+      // AGGIORNO LA GRAFICA
+      fightersRow.innerHTML += `<div class="col"> 
+        <div id="card${botFighter.name}" class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">${botFighter.name}</h5>
+            <p id="cardPower${botFighter.name}" class="card-text"><b>power:</b> ${botFighter.power}</p>
+            <p id="cardWeapon${botFighter.name}" class="card-text"><b>weapon:</b>  ${botFighter.weapon ? botFighter.weapon.name : "<i>empty</i>"}</p>
+            <p id="cardWeaponPower${botFighter.name}" class="card-text"><b>weapon power:</b>  ${botFighter.weapon ? botFighter.weapon.power : "<i>empty</i>"}</p>
+          </div>
+        </div>
+      </div>`;
+    }
 
     console.log("COMBATTENTI PRONTI (" + fighters.length + "): " + convertJSON(fighters));
     for(let i = 0; i < fighters.length; i++) {
-      console.log("NUOV ROUND");
+      console.log("NUOVO ROUND");
       
       const power1 = fighters[i].power + fighters[i].weapon.power;
       console.log("COMBATTENTE 1: " + convertJSON(fighters[i].name) + " + " + power1);
@@ -195,10 +208,15 @@ function startTournament(){
       const power2 = fighters[i].power + fighters[i].weapon.power;
       console.log("COMBATTENTE 2: " + convertJSON(fighters[i].name) + " + " + power2);
 
-      if(power1 < power2) // Vince il secondo combattente
+      if(power1 < power2) {// Vince il secondo combattente
         fighters[i-1].looser = true; // Segnalo i perdenti, per poi rimuoverli dopo
-      else if(power1 >= power2) // Vince il primo combattente o pareggiano
+        // AGGIORNO LA GRAFICA
+        document.getElementById(`card${fighters[i-1].name}`).classList.add("disabled");
+      } else { // Vince il primo combattente o pareggiano
         fighters[i].looser = true; // Segnalo i perdenti, per poi rimuoverli dopo
+        // AGGIORNO LA GRAFICA
+        document.getElementById(`card${fighters[i].name}`).classList.add("disabled");
+      } 
     }
     fighters = fighters.filter(fighter => fighter.looser != true); // Rimuovo i perdenti
     console.log("VINCITORI (" + fighters.length + "): " + convertJSON(fighters));
