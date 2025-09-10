@@ -9,3 +9,8 @@
 }
 
 /* USARE MOVE E POI AGGIUNGERE MOVED */
+
+.card.disabled {
+  background-color: lightgray;
+  font-style: italic;
+}
