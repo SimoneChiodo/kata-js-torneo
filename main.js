@@ -179,24 +179,22 @@ function startTournament(){
     }
 
     console.log("COMBATTENTI PRONTI (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
-    for(let i = 0; i < getNotLooserLength(fighters); i++) {
-      while(fighters[i].looser === true) i++; // Non uso combattenti che hanno perso
-
+    
+    // Ciclo tutti i combattenti (i combattenti sono ordinati: prima i vincitori, dopo i perdenti)
+    for(let i = 0; i < fighters.length && fighters[i].looser !== true; i++) { 
       console.log("NUOVO ROUND");
       const index1 = i; // Salvo l'indice (lo uso durante l'eliminazione del perdente)
       const power1 = fighters[i].power + fighters[i].weapon.power;
       console.log("COMBATTENTE 1: " + convertJSON(fighters[i].name) + " + " + power1);
       i++;
-      while(fighters[i].looser === true) i++; // Non uso combattenti che hanno perso
       const index2 = i; // Salvo l'indice (lo uso durante l'eliminazione del perdente)
       const power2 = fighters[i].power + fighters[i].weapon.power;
       console.log("COMBATTENTE 2: " + convertJSON(fighters[i].name) + " + " + power2);
 
-      if(power1 < power2) {// Vince il secondo combattente
+      if(power1 < power2) // Vince il secondo combattente
         fighters[index1].looser = true; // Segnalo i perdenti
-      } else { // Vince il primo combattente o pareggiano
+      else // Vince il primo combattente o pareggiano
         fighters[index2].looser = true; // Segnalo i perdenti
-      } 
     }
     
     console.log("VINCITORI (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
@@ -208,14 +206,18 @@ function startTournament(){
   // Mostro il podio composto da i primi 3 combattenti con la potenza maggiore, in ordine decrescente
   if(step === 5) {
     console.log("PREMIAZIONE ---------------");
-    // Informo chi non è sul podio (ho usato lo spread-operator per non mutare l'array originale)
-    [...fighters].sort((a, b) => b.power - a.power).map((fighter, index) => {
-      index < 3 ? fighter.notPodium = false : fighter.notPodium = true;
-    }); 
+    // Dico che tutti i combattenti non vanno sul podio (lo sovrascrivo dopo solo per i primi 3)
+    fighters.map(fighter => fighter.notPodium = true);
 
-    // Prendo i combattenti sul podio
-    let winners = [...fighters].sort((a, b) => b.power - a.power).slice(0, 3); 
-    
+    // Prendo i vincitori e sovrascrivo notPodium a false
+    const winners = [...fighters].filter(fighter => fighter.looser !== true). // Prendo i vincitori
+      sort((a, b) => ((b.power + b.weapon.power) - (a.power + a.weapon.power))). // Ordino in base alla loro potenza totale
+      slice(0, 3). // Prendo i primi 3 (i vincitori)
+      map(fighter => { 
+        fighter.notPodium = false; // Dico che questo combattente va sul podio
+        return fighter; // Salvo il vincitore
+      });
+
     console.log("SUL PODIO CI SONO:");
     winners.map((winner, index) => console.log(index+1 + ", " + convertJSON(winner)));
     
@@ -235,15 +237,15 @@ function getNotLooserLength(fighters){
 function updateStep(step){
   switch(step){
     case(1):
-      textStep.innerText = "Equipaggiamento arma";
-      textNextStep.innerText = "Potenziamento";
+      textStep.innerText = "Scelta dell'arma";
+      textNextStep.innerText = "Allenamento";
       break;
     case(2):
-      textStep.innerText = "Potenziamento";
-      textNextStep.innerText = "Qualifica";
+      textStep.innerText = "Allenamento";
+      textNextStep.innerText = "Qualificazione";
       break;
     case(3):
-      textStep.innerText = "Qualifica";
+      textStep.innerText = "Qualificazione";
       textNextStep.innerText = "Combattimento";
       break;
     case(4):
@@ -264,15 +266,17 @@ function updateStep(step){
 function printFighters(fighters) {
   // Ordino i combattenti
   let fightersSorted;
-  fightersSorted = [...fighters].sort((a, b) => a.looser - b.looser); // (NOTA: ASC -> "a.power - b.power")
+  fightersSorted = fighters.sort((a, b) => a.looser - b.looser); // (NOTA: ASC -> "a.power - b.power")
   // Se devo ordinare anche il podio
   if(step === 5)
     fightersSorted = [...fighters].sort((a, b) => {
       // Chi non è sul podio va sotto
       if (a.notPodium !== b.notPodium) return a.notPodium - b.notPodium;
+      if(a.notPodium === b.notPodium) return 0;
 
       // Chi ha perso va sotto
       if (a.looser !== b.looser) return a.looser - b.looser;
+      if(a.looser === b.looser) return 0;
 
       // I vincitori vengono ordinati per potenza 
       return b.power - a.power;
