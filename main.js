@@ -237,23 +237,23 @@ function getNotLooserLength(fighters){
 function updateStep(step){
   switch(step){
     case(1):
-      textStep.innerText = "Scelta dell'arma";
-      textNextStep.innerText = "Allenamento";
+      textStep.innerText = "2 - Scelta dell'arma";
+      textNextStep.innerText = "3 - Allenamento";
       break;
     case(2):
-      textStep.innerText = "Allenamento";
-      textNextStep.innerText = "Qualificazione";
+      textStep.innerText = "3 - Allenamento";
+      textNextStep.innerText = "4 - Qualificazione";
       break;
     case(3):
-      textStep.innerText = "Qualificazione";
-      textNextStep.innerText = "Combattimento";
+      textStep.innerText = "4 - Qualificazione";
+      textNextStep.innerText = "5 - Combattimento";
       break;
     case(4):
-      textStep.innerText = "Combattimento";
-      textNextStep.innerText = "Premiazione";
+      textStep.innerText = "5 - Combattimento";
+      textNextStep.innerText = "6 - Premiazione";
       break;
     case(5):
-      textStep.innerText = "Premiazione";
+      textStep.innerText = "6 - Premiazione";
       document.getElementById("nextStepContainer").classList.add("d-none");
       document.getElementById("buttonStartTournament").classList.add("disabled");
       break;
