@@ -103,7 +103,6 @@ const weapons = [
 const textStep = document.getElementById("textStep");
 const textNextStep = document.getElementById("textNextStep");
 let step = 0;
-let fightersFiltered = [];
 
 // Mostro i combattenti a schermo
 const fightersRow = document.getElementById("fightersRow");
@@ -124,10 +123,10 @@ function startTournament(){
     fighters.map(fighter => {
       let randomIndex = randomNumber(0, weapons.length-1); // Prendo l'indice di un'arma casuale (il massimo non è incluso)
       fighter.weapon = weapons.splice(randomIndex, 1)[0]; // Il combattente prende l'arma dall'elenco (NOTA: [0] rimuove l'oggetto dall'array)
-      // AGGIORNO LA GRAFICA
-      document.getElementById(`cardWeapon${fighter.name}`).innerHTML = `<b>weapon:</b>  ${fighter.weapon.name}`;
-      document.getElementById(`cardWeaponPower${fighter.name}`).innerHTML = `<b>weapon power:</b>  ${fighter.weapon.power}`;
     });
+
+    // AGGIORNO LA GRAFICA
+    printFighters(fighters);
     // Mostro i combattanti armati
     console.log("COMBATTENTI ARMATI: ");
     console.log(convertJSON(fighters));
@@ -143,12 +142,11 @@ function startTournament(){
       if(randomNumber(1, 2) == 1) { // 1/2 possibilità di potenziarsi
         fighter.power *= randomNumber(1, 100); // la potenza si moltiplica per un valore tra 1 e 100
         console.log("POTENTE: " + convertJSON(fighter));
-        // AGGIORNO LA GRAFICA
-        document.getElementById(`cardPower${fighter.name}`).innerHTML = `<b>power:</b>  ${fighter.power}`;
-      } else {
+      } else
         console.log("NORMALE: " + convertJSON(fighter));
-      }
     });
+    // AGGIORNO LA GRAFICA 
+    printFighters(fighters);
   }
 
   // FASE 3: QUALIFICAZIONE ---------------
@@ -157,15 +155,14 @@ function startTournament(){
     console.log("QUALIFICAZIONE ---------------");
     console.log("ECCO TUTTI I COMBATTENTI: " + convertJSON(fighters));
     fighters.map(fighter => {
-      const keep = fighter.power >= 2000;
-      if(!keep) { 
-        fighter.looser = true; // Informo chi ha perso
-        document.getElementById(`card${fighter.name}`).classList.add("disabled"); // AGGIORNO LA GRAFICA
-      }
-      else // Salvo i combattenti rimasti
-        fightersFiltered.push(fighter);
+      // Informo chi ha perso
+      !(fighter.power >= 2000) ? fighter.looser = true : fighter.looser = false;
     });
-    console.log("ECCO I COMBATTENTI CHE HANNO PASSATO LE QUALIFICAZIONI: " + convertJSON(fighters));
+
+    // AGGIORNO LA GRAFICA 
+    printFighters(fighters);
+
+    console.log("ECCO I COMBATTENTI CHE HANNO PASSATO LE QUALIFICAZIONI: " + convertJSON(getNotLooser(fighters)));
   }
 
   // FASE 4: COMBATTIMENTO ---------------
@@ -174,37 +171,40 @@ function startTournament(){
   // In caso di parita vince chi viene prima nella lista
   if(step == 4) {
     console.log("COMBATTIMENTO ---------------");
-    if(fightersFiltered.length % 2 !== 0) { // Se i combattenti sono dispari
-      const robot = { name: 'Robot', power: 4000, weapon: { name: "Mani nude", power: 0 }};
-      fighters.push(robot); // Aggiungo un combattente robot
-      fightersFiltered.push(robot); // Aggiungo un combattente robot
+    if(getNotLooserLength(fighters) % 2 !== 0) { // Se i combattenti sono dispari
+      // Aggiungo un combattente robot
+      fighters.push({ name: 'Robot', power: 4000, weapon: { name: "Mani nude", power: 0 }, looser: false}); 
       // AGGIORNO LA GRAFICA
       printFighters(fighters);
     }
 
-    console.log("COMBATTENTI PRONTI (" + fightersFiltered.length + "): " + convertJSON(fightersFiltered));
-    for(let i = 0; i < fightersFiltered.length; i++) {
+    console.log("COMBATTENTI PRONTI (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
+    for(let i = 0; i < fighters.length; i++) {
+      if(i >= fighters.length) return; // Controllo se ho finito i combattenti (se rimangono solo perdenti)
+      while(fighters[i].looser === true) { // Non uso combattenti che hanno perso
+        i++
+        if(i >= fighters.length) return; // Controllo se ho finito i combattenti (se rimangono solo perdenti)
+      }
+
       console.log("NUOVO ROUND");
-      
-      const power1 = fightersFiltered[i].power + fightersFiltered[i].weapon.power;
-      console.log("COMBATTENTE 1: " + convertJSON(fightersFiltered[i].name) + " + " + power1);
+      const index1 = i; // Salvo l'indice (lo uso durante l'eliminazione del perdente)
+      const power1 = fighters[i].power + fighters[i].weapon.power;
+      console.log("COMBATTENTE 1: " + convertJSON(fighters[i].name) + " + " + power1);
       i++;
-      const power2 = fightersFiltered[i].power + fightersFiltered[i].weapon.power;
-      console.log("COMBATTENTE 2: " + convertJSON(fightersFiltered[i].name) + " + " + power2);
+      while(fighters[i].looser === true) i++; // Non uso combattenti che hanno perso
+      const index2 = i; // Salvo l'indice (lo uso durante l'eliminazione del perdente)
+      const power2 = fighters[i].power + fighters[i].weapon.power;
+      console.log("COMBATTENTE 2: " + convertJSON(fighters[i].name) + " + " + power2);
 
       if(power1 < power2) {// Vince il secondo combattente
-        fightersFiltered[i-1].looser = true; // Segnalo i perdenti, per poi rimuoverli dopo
+        fighters[index1].looser = true; // Segnalo i perdenti
       } else { // Vince il primo combattente o pareggiano
-        fightersFiltered[i].looser = true; // Segnalo i perdenti, per poi rimuoverli dopo
+        fighters[index2].looser = true; // Segnalo i perdenti
       } 
     }
-    fightersFiltered = fightersFiltered.filter(fighter => fighter.looser != true); // Rimuovo i perdenti
-    console.log("VINCITORI (" + fightersFiltered.length + "): " + convertJSON(fightersFiltered));
+    
+    console.log("VINCITORI (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
     // AGGIORNO LA GRAFICA
-    fighters = fighters.map(fighter => {
-      let newFighter = fightersFiltered.find(fighterFiltered => fighterFiltered.name === fighter.name); // Cerco una versione aggiornata nell'altro array
-      return newFighter ?? fighter; // Se non trova una versione aggiornata, restituisce l'originale
-    });
     printFighters(fighters);
   }
 
@@ -212,7 +212,12 @@ function startTournament(){
   // Mostro il podio composto da i primi 3 combattenti con la potenza maggiore, in ordine decrescente
   if(step == 5) {
     console.log("PREMIAZIONE ---------------");
-    let winners = fightersFiltered.sort((a, b) => b.power - a.power).slice(0, 3); // Creo una nuova variabile per il podio (NOTA: ASC -> "a.power - b.power")
+    // Informo chi non è sul podio (ho usato lo spread-operator per non mutare l'array originale)
+    [...fighters].sort((a, b) => b.power - a.power).slice(3).map(fighter => fighter.notPodium = true); 
+
+    // Prendo i combattenti sul podio
+    let winners = [...fighters].sort((a, b) => b.power - a.power).slice(0, 3); 
+    
     console.log("SUL PODIO CI SONO:");
     winners.map((winner, index) => {
       console.log(index+1 + ", " + convertJSON(winner))
@@ -230,15 +235,17 @@ function startTournament(){
       </div>`;
     });
 
-    fightersFiltered = fightersFiltered.sort((a, b) => b.power - a.power);
-    fightersFiltered.slice(3).map(fighter => {
-      fighter.notPodium = true;
-      return fighter;
-    });
     // AGGIORNO LA GRAFICA
     printFighters(fighters);
-    console.log("FINALE: " + convertJSON(fightersFiltered));
+    console.log("FINALE: " + convertJSON(getNotLooser(fighters)));
   }
+}
+
+function getNotLooser(fighters){
+  return fighters.filter(fighter => fighter.looser != true);
+}
+function getNotLooserLength(fighters){
+  return fighters.filter(fighter => fighter.looser != true).length;
 }
 
 function updateStep(step){
@@ -271,8 +278,11 @@ function updateStep(step){
 }
 
 function printFighters(fighters) {
+  // Sort fighters
+  const fightersSorted = [...fighters].sort((a, b) => a.looser - b.looser); // (NOTA: ASC -> "a.power - b.power")
+
   fightersRow.innerHTML = ""; // Reset at start
-  fighters.map(fighter => {
+  fightersSorted.map(fighter => {
     fightersRow.innerHTML += `<div class="col"> 
       <div id="card${fighter.name}" class="card h-100 ${fighter.looser ? "disabled" : ""} ${fighter.notPodium ? "fst-italic" : ""}">
         <div class="card-body">
