@@ -114,7 +114,7 @@ function startTournament(){
 
   // FASE 1: SCELTA DELL'ARMA ---------------
   // Mostro i combattanti disarmati
-  if(step == 1) {
+  if(step === 1) {
     console.log("SCELTA DELL'ARMA ---------------");
     console.log("COMBATTENTI DISARMATI: ");
     console.log(convertJSON(fighters));
@@ -136,7 +136,7 @@ function startTournament(){
 
   // FASE 2: ALLENAMENTO ---------------
   // Ogni combattente può moltiplicare la sua potenza per un numero tra 1 e 100
-  if(step == 2) {
+  if(step === 2) {
     console.log("ALLENAMENTO ---------------");
     fighters.map(fighter => {
       if(randomNumber(1, 2) == 1) { // 1/2 possibilità di potenziarsi
@@ -151,7 +151,7 @@ function startTournament(){
 
   // FASE 3: QUALIFICAZIONE ---------------
   // Mantengo solo i combattenti che hanno una potenza sopra i 2000
-  if(step == 3) {
+  if(step === 3) {
     console.log("QUALIFICAZIONE ---------------");
     console.log("ECCO TUTTI I COMBATTENTI: " + convertJSON(fighters));
     fighters.map(fighter => {
@@ -169,7 +169,7 @@ function startTournament(){
   // Ogni combattente combatte con il successivo in lista 
   // Ogni combattente deve combattere solo una volta, nel caso siano dispari si aggiunge un robot combattente
   // In caso di parita vince chi viene prima nella lista
-  if(step == 4) {
+  if(step === 4) {
     console.log("COMBATTIMENTO ---------------");
     if(getNotLooserLength(fighters) % 2 !== 0) { // Se i combattenti sono dispari
       // Aggiungo un combattente robot
@@ -179,12 +179,8 @@ function startTournament(){
     }
 
     console.log("COMBATTENTI PRONTI (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
-    for(let i = 0; i < fighters.length; i++) {
-      if(i >= fighters.length) return; // Controllo se ho finito i combattenti (se rimangono solo perdenti)
-      while(fighters[i].looser === true) { // Non uso combattenti che hanno perso
-        i++
-        if(i >= fighters.length) return; // Controllo se ho finito i combattenti (se rimangono solo perdenti)
-      }
+    for(let i = 0; i < getNotLooserLength(fighters); i++) {
+      while(fighters[i].looser === true) i++; // Non uso combattenti che hanno perso
 
       console.log("NUOVO ROUND");
       const index1 = i; // Salvo l'indice (lo uso durante l'eliminazione del perdente)
@@ -210,31 +206,19 @@ function startTournament(){
 
   // FASE 4: PREMIAZIONE ---------------
   // Mostro il podio composto da i primi 3 combattenti con la potenza maggiore, in ordine decrescente
-  if(step == 5) {
+  if(step === 5) {
     console.log("PREMIAZIONE ---------------");
     // Informo chi non è sul podio (ho usato lo spread-operator per non mutare l'array originale)
-    [...fighters].sort((a, b) => b.power - a.power).slice(3).map(fighter => fighter.notPodium = true); 
+    [...fighters].sort((a, b) => b.power - a.power).map((fighter, index) => {
+      index < 3 ? fighter.notPodium = false : fighter.notPodium = true;
+    }); 
 
     // Prendo i combattenti sul podio
     let winners = [...fighters].sort((a, b) => b.power - a.power).slice(0, 3); 
     
     console.log("SUL PODIO CI SONO:");
-    winners.map((winner, index) => {
-      console.log(index+1 + ", " + convertJSON(winner))
-      // AGGIORNO LA GRAFICA
-      const podiumRow = document.getElementById("podium");
-      podiumRow.innerHTML += `<div class="col"> 
-        <div id="card${winner.name}" class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">${index+1}° ${winner.name}</h5>
-            <p id="cardPower${winner.name}" class="card-text"><b>power:</b> ${winner.power}</p>
-            <p id="cardWeapon${winner.name}" class="card-text"><b>weapon:</b>  ${winner.weapon ? winner.weapon.name : "<i>empty</i>"}</p>
-            <p id="cardWeaponPower${winner.name}" class="card-text"><b>weapon power:</b>  ${winner.weapon ? winner.weapon.power : "<i>empty</i>"}</p>
-          </div>
-        </div>
-      </div>`;
-    });
-
+    winners.map((winner, index) => console.log(index+1 + ", " + convertJSON(winner)));
+    
     // AGGIORNO LA GRAFICA
     printFighters(fighters);
     console.log("FINALE: " + convertJSON(getNotLooser(fighters)));
@@ -278,15 +262,31 @@ function updateStep(step){
 }
 
 function printFighters(fighters) {
-  // Sort fighters
-  const fightersSorted = [...fighters].sort((a, b) => a.looser - b.looser); // (NOTA: ASC -> "a.power - b.power")
+  // Ordino i combattenti
+  let fightersSorted;
+  fightersSorted = [...fighters].sort((a, b) => a.looser - b.looser); // (NOTA: ASC -> "a.power - b.power")
+  // Se devo ordinare anche il podio
+  if(step === 5)
+    fightersSorted = [...fighters].sort((a, b) => {
+      // Chi non è sul podio va sotto
+      if (a.notPodium !== b.notPodium) return a.notPodium - b.notPodium;
+
+      // Chi ha perso va sotto
+      if (a.looser !== b.looser) return a.looser - b.looser;
+
+      // I vincitori vengono ordinati per potenza 
+      return b.power - a.power;
+    });
 
   fightersRow.innerHTML = ""; // Reset at start
-  fightersSorted.map(fighter => {
+  fightersSorted.map((fighter, index) => {
     fightersRow.innerHTML += `<div class="col"> 
       <div id="card${fighter.name}" class="card h-100 ${fighter.looser ? "disabled" : ""} ${fighter.notPodium ? "fst-italic" : ""}">
         <div class="card-body">
-          <h5 class="card-title">${fighter.name}</h5>
+          <h5 class="card-title">
+            ${(step === 5 && index < 3) ? (index+1)+") " : ""} 
+            ${fighter.name}
+          </h5>
           <p id="cardPower${fighter.name}" class="card-text"><b>power:</b> ${fighter.power}</p>
           <p id="cardWeapon${fighter.name}" class="card-text"><b>weapon:</b>  ${fighter.weapon ? fighter.weapon.name : "<i>empty</i>"}</p>
           <p id="cardWeaponPower${fighter.name}" class="card-text"><b>weapon power:</b>  ${fighter.weapon ? fighter.weapon.power : "<i>empty</i>"}</p>
