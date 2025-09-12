@@ -100,7 +100,8 @@ const weapons = [
   }
 ];
 
-const buttonStart = document.getElementById("buttonStartTorunament");
+const textStep = document.getElementById("textStep");
+const textNextStep = document.getElementById("textNextStep");
 let step = 0;
 let fightersFiltered = [];
 
@@ -243,20 +244,29 @@ function startTournament(){
 function updateStep(step){
   switch(step){
     case(1):
-      buttonStart.innerText = "Potenzia";
+      textStep.innerText = "Equipaggiamento arma";
+      textNextStep.innerText = "Potenziamento";
       break;
     case(2):
-      buttonStart.innerText = "Qualifica";
+      textStep.innerText = "Potenziamento";
+      textNextStep.innerText = "Qualifica";
       break;
     case(3):
-      buttonStart.innerText = "Combattimento";
+      textStep.innerText = "Qualifica";
+      textNextStep.innerText = "Combattimento";
       break;
     case(4):
-      buttonStart.innerText = "Premiazione";
+      textStep.innerText = "Combattimento";
+      textNextStep.innerText = "Premiazione";
       break;
-
+    case(5):
+      textStep.innerText = "Premiazione";
+      document.getElementById("nextStepContainer").classList.add("d-none");
+      document.getElementById("buttonStartTournament").classList.add("disabled");
+      break;
+    
     default:
-      buttonStart.classList.add("disabled");
+      document.getElementById("buttonStartTournament").classList.add("disabled");
   }
 }
 

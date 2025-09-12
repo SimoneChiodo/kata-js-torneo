@@ -26,18 +26,36 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <header>
-      <h1>Apri la console</h1>
-      <button id="buttonStartTorunament" class="btn btn-large btn-primary" onclick="startTournament()">Equipaggia un'arma</button>
-      <a class="btn btn-large btn-danger" href="index.html">Reset</a>
-    </header>
+    <div class="wrapper container d-flex flex-column vh-100">
+      <header class="flex-grow-1">
+        <div class="text-center mt-3">
+          <h1 class="fw-bolder">Torneo Boolkaichi</h1>
 
-    <main>
-      <div class="container">
-        <div id="podium" class="row row-cols-1 row-cols-md-3 g-3 mb-5"></div>
-        <div id="fightersRow" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3"></div>
-      </div>
-    </main>
+          <div class="d-flex flex-column flex-md-row gap-2 justify-content-center">
+            <div class="flex-grow-1">
+              <h2 class="mb-0">Fase attuale: </h2>
+              <h3 id="textStep">Iscrizione</h3>
+            </div>
+            <div id="nextStepContainer" class="flex-grow-1">
+              <h2 class="mb-0 fst-italic">Fase successiva: </h2>
+              <h3 id="textNextStep" class="text-body-secondary fst-italic">Equipaggiamento arma</h3>
+            </div>
+          </div>
+
+          <button id="buttonStartTournament" class="btn btn-large btn-primary" onclick="startTournament()">Avanti</button>
+          <a class="btn btn-large btn-danger" href="index.html">Reset</a>
+        </div>
+      </header>
+      
+      <main>
+        <div>
+          <div id="podium" class="row row-cols-1 row-cols-md-3 g-3 mb-5"></div>
+          <div id="fightersRow" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3"></div>
+
+          <p class="text-center text-body-secondary fst-italic mt-5">I vari passaggi si possono vedere anche nella console</p>
+        </div>
+      </main>
+    </div>
 
 
     <!-- BOOTSTRAP JS -->

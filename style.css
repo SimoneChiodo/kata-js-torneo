@@ -1,15 +1,9 @@
-.move{
-  position: absolute;
-  left: 0%;
-  transition: all 1s;
+/* UTILITIES */
+.vh-100 {
+  height: 100vh;
 }
 
-.moved {
-  left: 100%;
-}
-
-/* USARE MOVE E POI AGGIUNGERE MOVED */
-
+/* RESET BOOTSTRAP */
 .card.disabled {
   background-color: lightgray;
   font-style: italic;
