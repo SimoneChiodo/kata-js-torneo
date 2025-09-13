@@ -101,6 +101,7 @@ const weapons = [
 ];
 
 const textStep = document.getElementById("textStep");
+const descriptionStep = document.getElementById("descriptionStep");
 const textNextStep = document.getElementById("textNextStep");
 let step = 0;
 
@@ -244,21 +245,27 @@ function updateStep(step){
     case(1):
       textStep.innerText = "2 - Scelta dell'arma";
       textNextStep.innerText = "3 - Allenamento";
+      descriptionStep.innerText = "Ogni combattente sceglierà casualmente un'arma. Una volta scelta, un'arma non sarà più disponibile per i successivi combattenti.";
       break;
     case(2):
       textStep.innerText = "3 - Allenamento";
       textNextStep.innerText = "4 - Qualificazione";
+      descriptionStep.innerText = "Ogni combattente si sottoporrà ad un allenamento che incrementerà (o forse no) la sua potenza, moltiplicandola per un numero casuale tra 1 e 100.";
       break;
     case(3):
       textStep.innerText = "4 - Qualificazione";
       textNextStep.innerText = "5 - Combattimento";
+      descriptionStep.innerText = "Escludiamo dal torneo chi, dopo l'allenamento, non è riuscito a raggiungere una potenza di almeno 2000.";
       break;
     case(4):
       textStep.innerText = "5 - Combattimento";
       textNextStep.innerText = "6 - Premiazione";
+      descriptionStep.innerText = `I combattimenti si svolgeranno tra un partecipante e il successivo dell'elenco, assicurandosi che ognuno combatta una sola volta.
+      In ogni scontro vincerà il combattente con la potenza più alta. In caso di parità vincerà chi "gioca in casa", ossia chi viene prima nell'elenco.`;
       break;
     case(5):
       textStep.innerText = "6 - Premiazione";
+      descriptionStep.innerText = "I vincitori del Torneo Boolkaichi salgono sul podio!";
       document.getElementById("nextStepContainer").classList.add("d-none");
       document.getElementById("buttonStartTournament").classList.add("disabled");
       break;
