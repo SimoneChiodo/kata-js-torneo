@@ -115,9 +115,8 @@ function startTournament(){
   // FASE 1: SCELTA DELL'ARMA ---------------
   // Mostro i combattanti disarmati
   if(step === 1) {
-    console.log("SCELTA DELL'ARMA ---------------");
-    console.log("COMBATTENTI DISARMATI: ");
-    console.log(convertJSON(fighters));
+    console.log("FASE 1: SCELTA DELL'ARMA ---------------");
+    console.log("ELENCO COMBATTENTI (" + getNotLooserLength(fighters) + "): " + convertJSON(fighters));
   
     // Ogni combattente prende un'arma random (questa non sarà più disponibile per gli altri)
     fighters.map(fighter => {
@@ -128,22 +127,21 @@ function startTournament(){
     // AGGIORNO LA GRAFICA
     printFighters(fighters);
     // Mostro i combattanti armati
-    console.log("COMBATTENTI ARMATI: ");
-    console.log(convertJSON(fighters));
+    console.log("ELENCO COMBATTENTI ARMATI (" + getNotLooserLength(fighters) + "): " + convertJSON(fighters));
     // Controllo che le armi siano vuote
-    console.log(weapons);
+    // console.log(weapons);
   }
 
   // FASE 2: ALLENAMENTO ---------------
   // Ogni combattente può moltiplicare la sua potenza per un numero tra 1 e 100
   if(step === 2) {
-    console.log("ALLENAMENTO ---------------");
+    console.log("FASE 2: ALLENAMENTO ---------------");
     fighters.map(fighter => {
       if(randomNumber(1, 2) == 1) { // 1/2 possibilità di potenziarsi
         fighter.power *= randomNumber(1, 100); // la potenza si moltiplica per un valore tra 1 e 100
-        console.log("POTENTE: " + convertJSON(fighter));
+        console.log("ALLENAMENTO RIUSCITO: " + convertJSON(fighter));
       } else
-        console.log("NORMALE: " + convertJSON(fighter));
+        console.log("ALLENAMENTO FALLITO: " + convertJSON(fighter));
     });
     // AGGIORNO LA GRAFICA 
     printFighters(fighters);
@@ -152,8 +150,8 @@ function startTournament(){
   // FASE 3: QUALIFICAZIONE ---------------
   // Mantengo solo i combattenti che hanno una potenza sopra i 2000
   if(step === 3) {
-    console.log("QUALIFICAZIONE ---------------");
-    console.log("ECCO TUTTI I COMBATTENTI: " + convertJSON(fighters));
+    console.log("FASE 3: QUALIFICAZIONE ---------------");
+    console.log("ELENCO COMBATTENTI (" + getNotLooserLength(fighters) + "): " + convertJSON(fighters));
     fighters.map(fighter => {
       // Informo chi ha perso
       !(fighter.power >= 2000) ? fighter.looser = true : fighter.looser = false;
@@ -162,7 +160,7 @@ function startTournament(){
     // AGGIORNO LA GRAFICA 
     printFighters(fighters);
 
-    console.log("ECCO I COMBATTENTI CHE HANNO PASSATO LE QUALIFICAZIONI: " + convertJSON(getNotLooser(fighters)));
+    console.log("ELENCO COMBATTENTI CHE HANNO PASSATO LE QUALIFICAZIONI (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
   }
 
   // FASE 4: COMBATTIMENTO ---------------
@@ -170,15 +168,16 @@ function startTournament(){
   // Ogni combattente deve combattere solo una volta, nel caso siano dispari si aggiunge un robot combattente
   // In caso di parita vince chi viene prima nella lista
   if(step === 4) {
-    console.log("COMBATTIMENTO ---------------");
+    console.log("FASE 4: COMBATTIMENTO ---------------");
     if(getNotLooserLength(fighters) % 2 !== 0) { // Se i combattenti sono dispari
       // Aggiungo un combattente robot
       fighters.push({ name: 'Robot', power: 4000, weapon: { name: "Mani nude", power: 0 }, looser: false}); 
       // AGGIORNO LA GRAFICA
       printFighters(fighters);
+      console.log("È STATO AGGIUNTO UN COMBATTENTE ROBOT");
     }
 
-    console.log("COMBATTENTI PRONTI (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
+    console.log("ELENCO COMBATTENTI PRONTI AL COMBATTIMENTO (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
     
     // Ciclo tutti i combattenti (i combattenti sono ordinati: prima i vincitori, dopo i perdenti)
     for(let i = 0; i < fighters.length && fighters[i].looser !== true; i++) { 
@@ -191,13 +190,16 @@ function startTournament(){
       const power2 = fighters[i].power + fighters[i].weapon.power;
       console.log("COMBATTENTE 2: " + convertJSON(fighters[i].name) + " + " + power2);
 
-      if(power1 < power2) // Vince il secondo combattente
+      if(power1 < power2) { // Vince il secondo combattente
         fighters[index1].looser = true; // Segnalo i perdenti
-      else // Vince il primo combattente o pareggiano
+        console.log("VINCITORE: " + convertJSON(fighters[index2].name));
+      } else { // Vince il primo combattente o pareggiano
         fighters[index2].looser = true; // Segnalo i perdenti
+        console.log("VINCITORE: " + convertJSON(fighters[index1].name));
+      }
     }
     
-    console.log("VINCITORI (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
+    console.log("ELENCO VINCITORI (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
     // AGGIORNO LA GRAFICA
     printFighters(fighters);
   }
@@ -205,7 +207,8 @@ function startTournament(){
   // FASE 4: PREMIAZIONE ---------------
   // Mostro il podio composto da i primi 3 combattenti con la potenza maggiore, in ordine decrescente
   if(step === 5) {
-    console.log("PREMIAZIONE ---------------");
+    console.log("FASE 4: PREMIAZIONE ---------------");
+    console.log("ELENCO DEI COMBATTENTI RIMASTI (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
     // Dico che tutti i combattenti non vanno sul podio (lo sovrascrivo dopo solo per i primi 3)
     fighters.map(fighter => fighter.notPodium = true);
 
@@ -223,17 +226,19 @@ function startTournament(){
     
     // AGGIORNO LA GRAFICA
     printFighters(fighters);
-    console.log("FINALE: " + convertJSON(getNotLooser(fighters)));
   }
 }
 
+// Metodo per prendere i combattenti che non hanno perso
 function getNotLooser(fighters){
   return fighters.filter(fighter => fighter.looser != true);
 }
+// Metodo per prendere il numero di combattenti che non hanno perso
 function getNotLooserLength(fighters){
   return fighters.filter(fighter => fighter.looser != true).length;
 }
 
+// Metodo per aggiorare il testo dei vari step
 function updateStep(step){
   switch(step){
     case(1):
@@ -263,6 +268,7 @@ function updateStep(step){
   }
 }
 
+// Metodo per mostrare in pagina i combattenti nelle loro card
 function printFighters(fighters) {
   // Ordino i combattenti
   let fightersSorted;
@@ -311,7 +317,7 @@ function printFighters(fighters) {
 function randomNumber(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-
+// Metodo per stampare in console stringhe JSON
 function convertJSON(param){
   return JSON.stringify(param);
 }

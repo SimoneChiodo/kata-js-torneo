@@ -27,10 +27,12 @@
   </head>
   <body>
     <div class="wrapper container d-flex flex-column vh-100">
-      <header class="flex-grow-1 my-4">
+      <header class="my-4">
         <div class="text-center">
+          <!-- TITLE -->
           <h1 class="fw-bolder">Torneo Boolkaichi</h1>
 
+          <!-- STEPS -->
           <div class="d-flex flex-column flex-md-row gap-2 justify-content-center">
             <div class="flex-grow-1">
               <h2 class="mb-0">Fase attuale: </h2>
@@ -42,19 +44,20 @@
             </div>
           </div>
 
-          <div class="d-flex flex-column flex-md-row gap-2 justify-content-center">
+          <!-- BUTTONS -->
+          <div class="d-flex flex-column flex-md-row gap-2 justify-content-center mt-3">
             <button id="buttonStartTournament" class="btn btn-large px-5 btn-primary" onclick="startTournament()">Avanti</button>
             <a class="btn btn-large px-5 btn-danger" href="index.html">Reset</a>
           </div>
         </div>
       </header>
       
-      <main>
-        <div>
-          <div id="fightersRow" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3"></div>
+      <main class="flex-grow-1">
+        <!-- FIGHTERS ROW -->
+        <div id="fightersRow" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3 p-1 p-md-3"></div>
 
-          <p class="text-center text-body-secondary fst-italic mt-5">I vari passaggi si possono vedere anche nella console</p>
-        </div>
+        <!-- INFO ABOUT CONSOLE -->
+        <p class="text-center text-body-secondary fst-italic mt-5">Le varie fasi del torneo si possono vedere anche nella console</p>
       </main>
     </div>
 
