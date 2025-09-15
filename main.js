@@ -1,3 +1,6 @@
+const $one = document.querySelector.bind(document);
+const $all = document.querySelectorAll.bind(document);
+
 // Dichiaro le liste "fighters" (combattenti) e "weapons" (armi)
 let fighters = [
   {
@@ -100,13 +103,13 @@ const weapons = [
   }
 ];
 
-const textStep = document.getElementById("textStep");
-const descriptionStep = document.getElementById("descriptionStep");
-const textNextStep = document.getElementById("textNextStep");
+const textStep =  $one("#textStep");
+const descriptionStep =  $one("#descriptionStep");
+const textNextStep =  $one("#textNextStep");
 let step = 0;
 
 // Mostro i combattenti a schermo
-const fightersRow = document.getElementById("fightersRow");
+const fightersRow =  $one("#fightersRow");
 printFighters(fighters);
 
 // Funzione per far partire il torneo
@@ -116,8 +119,9 @@ function startTournament(){
   // FASE 1: SCELTA DELL'ARMA ---------------
   // Mostro i combattanti disarmati
   if(step === 1) {
-    console.log("FASE 1: SCELTA DELL'ARMA ---------------");
-    console.log("ELENCO COMBATTENTI (" + getNotLooserLength(fighters) + "): " + convertJSON(fighters));
+    console.log("%c🗡 FASE 1: SCELTA DELL'ARMA ---------------", "color: orange; font-size: 1rem;");
+    console.log("ELENCO COMBATTENTI (" + getNotLooserLength(fighters) + "): ");
+    console.table(fighters);
   
     // Ogni combattente prende un'arma random (questa non sarà più disponibile per gli altri)
     fighters.map(fighter => {
@@ -128,7 +132,8 @@ function startTournament(){
     // AGGIORNO LA GRAFICA
     printFighters(fighters);
     // Mostro i combattanti armati
-    console.log("ELENCO COMBATTENTI ARMATI (" + getNotLooserLength(fighters) + "): " + convertJSON(fighters));
+    console.log("ELENCO COMBATTENTI ARMATI (" + getNotLooserLength(fighters) + "): ");
+    console.table(fighters);
     // Controllo che le armi siano vuote
     // console.log(weapons);
   }
@@ -136,13 +141,15 @@ function startTournament(){
   // FASE 2: ALLENAMENTO ---------------
   // Ogni combattente può moltiplicare la sua potenza per un numero tra 1 e 100
   if(step === 2) {
-    console.log("FASE 2: ALLENAMENTO ---------------");
+    console.log("%c💪🏻 FASE 2: ALLENAMENTO ---------------", "color: orange; font-size: 1rem;");
     fighters.map(fighter => {
       if(randomNumber(1, 2) == 1) { // 1/2 possibilità di potenziarsi
         fighter.power *= randomNumber(1, 100); // la potenza si moltiplica per un valore tra 1 e 100
-        console.log("ALLENAMENTO RIUSCITO: " + convertJSON(fighter));
+        console.log("%cALLENAMENTO RIUSCITO: ", "color: lightblue; font-size: .9rem;");
+        console.log(convertJSON(fighter));
       } else
-        console.log("ALLENAMENTO FALLITO: " + convertJSON(fighter));
+        console.log("%cALLENAMENTO FALLITO: ", "color: lightblue; font-size: .9rem;");
+        console.log(convertJSON(fighter));
     });
     // AGGIORNO LA GRAFICA 
     printFighters(fighters);
@@ -151,17 +158,18 @@ function startTournament(){
   // FASE 3: QUALIFICAZIONE ---------------
   // Mantengo solo i combattenti che hanno una potenza sopra i 2000
   if(step === 3) {
-    console.log("FASE 3: QUALIFICAZIONE ---------------");
-    console.log("ELENCO COMBATTENTI (" + getNotLooserLength(fighters) + "): " + convertJSON(fighters));
-    fighters.map(fighter => {
-      // Informo chi ha perso
-      !(fighter.power >= 2000) ? fighter.looser = true : fighter.looser = false;
-    });
+    console.log("%c🎯 FASE 3: QUALIFICAZIONE ---------------", "color: orange; font-size: 1rem;");
+    console.log("ELENCO COMBATTENTI (" + getNotLooserLength(fighters) + "): ");
+    console.table(fighters);
+    
+    // Informo chi ha perso
+    fighters.map(fighter => { fighter.looser = fighter.power < 2000; });
 
     // AGGIORNO LA GRAFICA 
     printFighters(fighters);
 
-    console.log("ELENCO COMBATTENTI CHE HANNO PASSATO LE QUALIFICAZIONI (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
+    console.log("ELENCO COMBATTENTI CHE HANNO PASSATO LE QUALIFICAZIONI (" + getNotLooserLength(fighters) + "): ");
+    console.table(getNotLooser(fighters));
   }
 
   // FASE 4: COMBATTIMENTO ---------------
@@ -169,7 +177,7 @@ function startTournament(){
   // Ogni combattente deve combattere solo una volta, nel caso siano dispari si aggiunge un robot combattente
   // In caso di parita vince chi viene prima nella lista
   if(step === 4) {
-    console.log("FASE 4: COMBATTIMENTO ---------------");
+    console.log("%c⚔ FASE 4: COMBATTIMENTO ---------------", "color: orange; font-size: 1rem;");
     if(getNotLooserLength(fighters) % 2 !== 0) { // Se i combattenti sono dispari
       // Aggiungo un combattente robot
       fighters.push({ name: 'Robot', power: 4000, weapon: { name: "Mani nude", power: 0 }, looser: false}); 
@@ -178,11 +186,12 @@ function startTournament(){
       console.log("È STATO AGGIUNTO UN COMBATTENTE ROBOT");
     }
 
-    console.log("ELENCO COMBATTENTI PRONTI AL COMBATTIMENTO (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
+    console.log("ELENCO COMBATTENTI PRONTI AL COMBATTIMENTO (" + getNotLooserLength(fighters) + "): ");
+    console.table(getNotLooser(fighters));
     
     // Ciclo tutti i combattenti (i combattenti sono ordinati: prima i vincitori, dopo i perdenti)
     for(let i = 0; i < fighters.length && fighters[i].looser !== true; i++) { 
-      console.log("NUOVO ROUND");
+      console.log("%cNUOVO ROUND", "color: lightblue; font-size: .9rem;");
       const index1 = i; // Salvo l'indice (lo uso durante l'eliminazione del perdente)
       const power1 = fighters[i].power + fighters[i].weapon.power;
       console.log("COMBATTENTE 1: " + convertJSON(fighters[i].name) + " + " + power1);
@@ -200,7 +209,8 @@ function startTournament(){
       }
     }
     
-    console.log("ELENCO VINCITORI (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
+    console.log("ELENCO VINCITORI (" + getNotLooserLength(fighters) + "): ");
+    console.table(getNotLooser(fighters));
     // AGGIORNO LA GRAFICA
     printFighters(fighters);
   }
@@ -208,8 +218,9 @@ function startTournament(){
   // FASE 4: PREMIAZIONE ---------------
   // Mostro il podio composto da i primi 3 combattenti con la potenza maggiore, in ordine decrescente
   if(step === 5) {
-    console.log("FASE 4: PREMIAZIONE ---------------");
-    console.log("ELENCO DEI COMBATTENTI RIMASTI (" + getNotLooserLength(fighters) + "): " + convertJSON(getNotLooser(fighters)));
+    console.log("%c🏆 FASE 4: PREMIAZIONE ---------------", "color: orange; font-size: 1rem;");
+    console.log("ELENCO DEI COMBATTENTI RIMASTI (" + getNotLooserLength(fighters) + "): ");
+    console.table(getNotLooser(fighters));
     // Dico che tutti i combattenti non vanno sul podio (lo sovrascrivo dopo solo per i primi 3)
     fighters.map(fighter => fighter.notPodium = true);
 
@@ -266,12 +277,12 @@ function updateStep(step){
     case(5):
       textStep.innerText = "6 - Premiazione";
       descriptionStep.innerText = "I vincitori del Torneo Boolkaichi salgono sul podio!";
-      document.getElementById("nextStepContainer").classList.add("d-none");
-      document.getElementById("buttonStartTournament").classList.add("disabled");
+      $one("#nextStepContainer").classList.add("d-none");
+      $one("#buttonStartTournament").classList.add("disabled");
       break;
     
     default:
-      document.getElementById("buttonStartTournament").classList.add("disabled");
+      $one("#buttonStartTournament").classList.add("disabled");
   }
 }
 
